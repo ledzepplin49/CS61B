@@ -106,6 +106,60 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    public boolean helper_null(int col) {
+        int low_bound=0;
+        boolean result = false;
+        for(int row=3;row>-1;row--){
+            if (tile(col,row)==null){
+                low_bound+=1;
+            }
+        }
+        for(int row=3;row>low_bound-1;row--) {
+            /**if ((tile(col,row)==null)&&(low_bound!=4)){
+                for(int j=row-1;j>=low_bound-1;j--) {
+                    if (tile(col, j) != null) {
+                        board.move(col, j + 1, tile(col, j));
+                    }
+                    result = true;
+                }
+                row=row+1;
+            }*/
+            while(tile(col,row)==null){
+                for(int j=row-1;j>-1;j--) {
+                    if (tile(col, j) != null) {
+                        board.move(col, j + 1, tile(col, j));
+                    }
+                    result = true;
+                }
+            }
+        }
+        return helper_notnull(col,low_bound)||result;
+    }
+    public boolean helper_notnull(int col,int lowbound) {
+        boolean result = false;
+        for(int row=3;row>lowbound;row--) {
+           if((tile(col,row)!=null)&&(tile(col,row-1)!=null)){
+                if (tile(col,row).value()==tile(col,row-1).value()) {
+                    this.score+=tile(col,row-1).merge(col,row,tile(col,row)).value();
+                    for(int j=row-1;j>=lowbound;j--) {
+                        if(tile(col,j)!=null){board.move(col,j+1,tile(col,j));}
+                    }
+                    lowbound+=1;
+                    result = true;
+                }
+            }
+
+        }
+        return result;
+    }
+    public boolean helper1(int col) {
+        for(int row=0;row<board.size();row++) {
+            if (tile(col,row)==null){
+                return helper_null(col);
+            }
+        }
+        return helper_notnull(col,0);
+    }
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -113,7 +167,15 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        if (side!=side.NORTH){
+            board.setViewingPerspective(side);
+        }
+        for (int c=0; c<board.size(); c++) {
+            if(helper1(c)){changed=true;}
+        }
+        if (side!=side.NORTH){
+            board.setViewingPerspective(side.NORTH);
+        }
         checkGameOver();
         if (changed) {
             setChanged();
@@ -138,6 +200,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for(int i=0; i<b.size(); i++) {
+            for(int j=0; j<b.size(); j++) {
+                if (b.tile(i,j)==null ){
+                    return true;
+                }
+
+            }
+        }
         return false;
     }
 
@@ -148,6 +218,15 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for(int i=0; i<b.size(); i++) {
+            for(int j=0; j<b.size(); j++) {
+                if (b.tile(i,j)==null ){
+                } else{
+                    if (b.tile(i,j).value()== MAX_PIECE) {
+                    return true;}
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +238,37 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        int len=b.size()-1;
+        for(int i=0; i<b.size(); i++) {
+            for(int j=0; j<b.size(); j++) {
+                if (b.tile(i,j)==null ){
+                    return true;
+                }
+            }
+        }
+        for(int i=0; i<b.size(); i++) {
+            for(int j=0; j<b.size(); j++) {
+                if ((i==len )&&(j==len)) {
+                    return false;
+                }
+                else if (j==len) {
+                    if (b.tile(i,j).value() == b.tile(i+1,j).value()) {
+                        return true;
+                    }
+                }
+                else if (i==len) {
+                    if (b.tile(i,j).value() == b.tile(i,j+1).value()) {
+                        return true;
+                    }
+                }
+                else{
+                    if ((b.tile(i,j).value()==b.tile(i+1,j).value() )||((b.tile(i,j).value()==b.tile(i,j+1).value() ))){
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
