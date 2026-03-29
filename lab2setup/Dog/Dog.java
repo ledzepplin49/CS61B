@@ -1,5 +1,5 @@
 package Dog;
-
+//done with set up
 public class Dog {
     private int size;
 
