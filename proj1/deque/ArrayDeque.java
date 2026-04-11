@@ -13,7 +13,7 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         this.nextFirst=4;
         this.nextLast=5;
     }
-
+    //add first
     public void addFirst(T item){
         if(size== items.length){
             resize(2*size());
@@ -22,37 +22,8 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         nextFirst=(nextFirst-1+items.length)%items.length;
         size++;
     };
-    /**
-    public void resize(int newSize){
-        T[] newItems = (T[]) new Object[newSize];
-        if(newSize>items.length){
-            if(nextFirst<nextLast){
-                System.arraycopy(items,nextFirst+1,newItems,1,size);
-                nextFirst=0;
-                nextLast=size+1;
-                items=newItems;
-            }else{
-                if(nextFirst==items.length-1){
-                    System.arraycopy(items,0,newItems,0,size);
-                    nextFirst=newSize-1;
-                } else if (nextLast==0) {
-                    System.arraycopy(items,nextFirst+1,newItems,0,size);
-                    nextFirst=newSize-1;
-                    nextLast=1+size;
-                }else{
-                    int front=nextLast;
-                    int rest=size-front;
-                    int back=newSize-rest;
-                    System.arraycopy(items,0,newItems,0,front);
-                    System.arraycopy(items,nextFirst+1,newItems,back,rest);
-                    nextFirst=back-1;
-                }
-            }
-            items=newItems;
-            System.out.println(newSize);
-        }
-    }
-     */
+
+    //resize array
     public void resize(int capacity) {
         T[] newItems = (T[]) new Object[capacity];
 
@@ -66,6 +37,7 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         nextFirst = capacity - 1; // 新数组的头部在末尾
         nextLast = size;          // 新数组的尾部在 size 处
     }
+    //add last
     public void addLast(T item){
         if(size==items.length){
             resize(2*size());
@@ -74,6 +46,7 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         nextLast=(nextLast+1)%items.length;
         size++;
     }
+    //return true when empty
     public boolean isEmpty(){
         if(size==0){
             return true;
@@ -81,9 +54,11 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
             return false;
         }
     }
+    //return size
     public int size(){
         return size;
     }
+    //print deque
     public void printDeque(){
         int i=nextFirst-1;
         while(items[i]!=null){
@@ -92,8 +67,9 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         }
         System.out.println("\n");
     }
+    //remove first
     public T removeFirst(){
-        if((size<items.length/4)&&(size>1)){
+        if((size<items.length/4)&&(size>=16)){
             resize((items.length)/2);
         }
         if(size==0){
@@ -105,6 +81,7 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         size--;
         return item;
     }
+    //remove last
     public T removeLast(){
         if((size<items.length/4)&&(size>1)){
             resize((items.length)/2);
@@ -112,16 +89,21 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
         if(size==0){
             return null;
         }
-        T item=items[(nextLast-1)%items.length];
-        nextLast=(nextLast-1)%items.length;
+        T item = items[(nextLast - 1 + items.length) % items.length];
+        nextLast = (nextLast - 1 + items.length) % items.length;
         items[nextLast]=null;
         size--;
         return item;
     }
+    //return indes th item
     public T get(int index){
+        if (index < 0 || index >= size) { // 必须拦截不合法的索引
+            return null;
+        }
         int i=(nextFirst+1+index+ items.length)%items.length;
         return items[i];
     }
+    //return iterator
     public Iterator<T> iterator(){
         return new ArrayDequeIterator();
     }
@@ -144,15 +126,22 @@ public class ArrayDeque <T>implements Iterable<T>,Deque<T> {
             return true;
         }
     }
+    //equals method
     @Override
-    public boolean equals(Object o){
-        if (o == null) { return false; }
-        if (this == o) { return true; } // optimization
-        if (this.getClass() != o.getClass()) { return false; }
-        ArrayDeque<T> other=(ArrayDeque<T>) o;
-        if(this.size!=other.size()){ return false; }
-        for(T item:this){
-            if(item!=other.removeFirst()){ return false; }
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || !(o instanceof Deque)) { return false; } // 必须用 instanceof Deque
+
+        Deque<T> other = (Deque<T>) o;
+
+        if (this.size() != other.size()) { return false; }
+
+        for (int i = 0; i < this.size(); i++) {
+            T item1 = this.get(i);
+            T item2 = other.get(i);
+            if (!item1.equals(item2)) { // 必须用 .equals()
+                return false;
+            }
         }
         return true;
     }
