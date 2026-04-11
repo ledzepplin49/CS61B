@@ -138,4 +138,55 @@ public class LinkedListDequeTest {
 
 
     }
+    @Test
+    public void iteratorTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        for (int i = 0; i < 1000000; i++) {
+            lld1.addLast(i);
+        }
+        double i=0;
+        for (int item : lld1) {
+                assertEquals("Should have the same value", i, (double) item, 0.0);
+                i++;
+        }
+        System.out.println(i);
+    }
+    @Test
+    public void testEquals() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld3 = new LinkedListDeque<>();
+
+        // 1. 空队列比较 (Empty vs Empty)
+        assertTrue("Two empty deques should be equal", lld1.equals(lld2));
+
+        // 2. 存入相同数据后比较 (Same size, same elements, same order)
+        lld1.addLast(1);
+        lld1.addLast(2);
+        lld1.addLast(3);
+
+        lld2.addLast(1);
+        lld2.addLast(2);
+        lld2.addLast(3);
+        assertTrue("Deques with same elements in same order should be equal", lld1.equals(lld2));
+
+        // 3. 自反性 (Reflexivity: a.equals(a) 必须为 true)
+        assertTrue("A deque should be equal to itself", lld1.equals(lld1));
+
+        // 4. 与 null 比较 (Null check: 绝对不能抛出 NullPointerException，必须返回 false)
+        assertFalse("Should return false when comparing with null", lld1.equals(null));
+
+        // 5. 与完全不同类型的对象比较 (Type check: 不能抛出 ClassCastException，必须返回 false)
+        String notADeque = "I am a String, not a Deque!";
+        assertFalse("Should return false when compared to a different class type", lld1.equals(notADeque));
+
+        // 6. 大小不同时的比较 (Different sizes)
+        lld3.addLast(1);
+        lld3.addLast(2);
+        assertFalse("Deques with different sizes should not be equal", lld1.equals(lld3));
+
+        // 7. 大小相同，但元素内容/顺序不同时的比较 (Same size, different elements)
+        lld3.addLast(4); // lld1 是 [1, 2, 3]，lld3 是 [1, 2, 4]
+        assertFalse("Deques with different elements should not be equal", lld1.equals(lld3));
+    }
 }

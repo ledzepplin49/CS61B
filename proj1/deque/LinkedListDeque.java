@@ -1,38 +1,40 @@
 package deque;
 
-public class LinkedListDeque<BleepBlorp> {
-    private IntNode sentinel;
+import java.util.Iterator;
+
+public class LinkedListDeque<T>implements Iterable<T>,Deque<T> {
+    private Node sentinel;
     private int size;
-    public class IntNode {
-        public BleepBlorp item;
-        public IntNode back;
-        public IntNode front;
-        public IntNode(BleepBlorp item) {
+    public class Node {
+        public T item;
+        public Node back;
+        public Node front;
+        public Node(T item) {
             this.item = item;
         }
-        public IntNode(BleepBlorp item, IntNode Back,IntNode Front) {
+        public Node(T item, Node Back,Node Front) {
             this.item = item;
             this.back=Back;
             this.front=Front;
         }
-        public IntNode() {
+        public Node() {
             this.item = null;
         }
     }
     public LinkedListDeque(){
-        sentinel = new IntNode();
+        sentinel = new Node();
         sentinel.back=sentinel;
         sentinel.front=sentinel;
         size = 0;
     };
-    public void addFirst(BleepBlorp item){
-        IntNode newnode =new IntNode(item,sentinel.back,sentinel);
+    public void addFirst(T item){
+        Node newnode =new Node(item,sentinel.back,sentinel);
         sentinel.back.front=newnode;
         sentinel.back=newnode;
         size++;
     }
-    public void addLast(BleepBlorp item){
-        IntNode newnode=new IntNode(item,sentinel,sentinel.front);
+    public void addLast(T item){
+        Node newnode=new Node(item,sentinel,sentinel.front);
         sentinel.front.back=newnode;
         sentinel.front=newnode;
         size++;
@@ -48,37 +50,37 @@ public class LinkedListDeque<BleepBlorp> {
         return size;
     }
     public void printDeque(){
-        IntNode temp=sentinel.back;
+        Node temp=sentinel.back;
         while(temp!=sentinel){
             System.out.print(temp.item+" ");
             temp=temp.back;
         }
         System.out.println("\n");
     }
-    public BleepBlorp removeFirst(){
+    public T removeFirst(){
         if (sentinel.front==sentinel){
             return null;
         }
-        IntNode temp=sentinel.back;
+        Node temp=sentinel.back;
         sentinel.back.back.front=sentinel;
         sentinel.back.front=null;
         sentinel.back=sentinel.back.back;
         size--;
         return temp.item;
     }
-    public BleepBlorp removeLast(){
+    public T removeLast(){
         if (sentinel.front==sentinel){
             return null;
         }
-        IntNode temp=sentinel.front;
+        Node temp=sentinel.front;
         temp.front.back=sentinel;
         sentinel.front=temp.front;
         size--;
         return temp.item;
     }
-    public BleepBlorp get(int index){
+    public T get(int index){
         int i=0;
-        IntNode temp=sentinel;
+        Node temp=sentinel;
         if(index>size){
             return null;
         }
@@ -88,9 +90,9 @@ public class LinkedListDeque<BleepBlorp> {
         }
         return temp.item;
     }
-    public BleepBlorp getRecursive(int index){
-        IntNode temp=sentinel.back;
-        BleepBlorp value;
+    public T getRecursive(int index){
+        Node temp=sentinel.back;
+        T value;
         if(index==1){
             return sentinel.back.item;
         }else{
@@ -100,4 +102,40 @@ public class LinkedListDeque<BleepBlorp> {
         sentinel.back=temp;
         return value;
     }
+    public Iterator<T> iterator(){
+        return new LinkedListDequeIterator();
+    }
+    private class LinkedListDequeIterator implements Iterator<T> {
+        private Node current=sentinel.back;
+        public LinkedListDequeIterator(){
+            current=sentinel.back;
+        }
+        @Override
+        public boolean hasNext(){
+            if(current!=sentinel){
+                return true;
+            }
+            return false;
+        }
+        @Override
+        public T next(){
+            T item=current.item;
+            current=current.back;
+            return item;
+        }
+    }
+    @Override
+    public boolean equals(Object o){
+        if (o == null) { return false; }
+        if (this == o) { return true; } // optimization
+        if (this.getClass() != o.getClass()) { return false; }
+        LinkedListDeque<T> other=(LinkedListDeque<T>) o;
+        if(this.size!=other.size()){ return false; }
+        for(T item:this){
+            if(item!=other.removeFirst()){ return false; }
+        }
+        return true;
+    }
+
+
 }
