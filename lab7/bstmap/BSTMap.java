@@ -74,6 +74,8 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         root = put(key,value,root);
     };
 
+    public void printInOrder(){}
+
     /**set the value into node**/
     private Node put(K key, V value,Node node){
         if (node==null) return new Node(key,value,1);
